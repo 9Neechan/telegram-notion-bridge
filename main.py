@@ -190,9 +190,9 @@ def removeFile(file):
 	    print("Error: %s file not found" % file)
 
 
-@client.on(events.NewMessage(chats=('amcp_feed')))
+@client.on(events.NewMessage(chats=(api_config.tg_chat)))
 async def newPostInChannel(event):
-	# print(event)
+	#print(event)
 	msg_text = event.message.message
 
 	img_url = ''
@@ -217,13 +217,14 @@ async def newPostInChannel(event):
 		page = createPage(msg_text.split('\n')[0], NOTION_DATABASE_ID)
 
 		paragraphs = createParagraphsWithUrl(event)
+		page['children'] = paragraphs
+
 
 		if img_url:
 			page['children'].append(createImg(img_url))
 		else:
-			page['children'].append(createImg('https://ibb.co/0VSpHkj'))
+			page['children'].append(createImg(api_config.imgbb_img_url))
 
-		page['children'] = paragraphs
 		page['properties']['Date'] = createDate()
 
 		response = requests.post(base_url, headers=headers, json=page)
